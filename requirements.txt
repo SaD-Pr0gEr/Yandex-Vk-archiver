@@ -1,0 +1,9 @@
+about-time==3.1.1
+alive-progress==2.4.1
+certifi==2021.10.8
+charset-normalizer==2.0.12
+grapheme==0.6.0
+idna==3.3
+python-dotenv==0.20.0
+requests==2.27.1
+urllib3==1.26.9
