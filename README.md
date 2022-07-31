@@ -1,9 +1,9 @@
-#VK photo archiver on Yandex
+# VK photo archiver on Yandex
 
 Project for backing up photos from VK to Yandex Disk
 ## Installation
 ```
-git clone https://github.com/SaD-Pr0gEr/Yandex-Vk-archivator.git
+git clone https://github.com/SaD-Pr0gEr/Yandex-Vk-archiver.git
 pip install -r requirements.txt
 ```
 
