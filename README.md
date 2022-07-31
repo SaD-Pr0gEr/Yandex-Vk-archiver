@@ -1,18 +1,22 @@
-# Архиватор фото с VK на Яндекс Диск
+#VK photo archiver on Yandex
 
-Проект для резервного копирования фотографий с ВК на Яндекс Диск. Для запуска проекта сначала установите зависимости! Для этого наберите команду 
+Project for backing up photos from VK to Yandex Disk
+## Installation
 ```
+git clone https://github.com/SaD-Pr0gEr/Yandex-Vk-archivator.git
 pip install -r requirements.txt
 ```
 
-Далее надо создать ```.env``` файл и туда добавить следующее
+## Setting up environment
+### Windows
 ```
-VK_TOKEN=токен с ВК
-YANDEX_TOKEN=токен с Яндекс
-USER_ID_VK=айди пользователя ВК
-VERSION=версия ВК(можете просто ставить 5.77)
+python -m venv venv
+venv\Scripts\activate
 ```
-Запустите файл ```runner.py```
+### Linux
 ```
-python runner.py
+python3 -m venv env
+source env/bin/activate
 ```
+## Run project
+```python runner.py```

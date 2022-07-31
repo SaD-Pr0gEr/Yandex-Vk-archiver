@@ -1,37 +1,58 @@
 import time
 from datetime import datetime
 
-from alive_progress import alive_bar
+from requests import post
 
-from utils import RequestManager
+from config import TOKEN_YANDEX
+from utils import progress_bar
 
 
-class YandexUpload(RequestManager):
-    """Загрузчик на Яндекс диск"""
+class YandexUpload:
+    """Yandex Disk uploader"""
 
-    def upload(self, file_path: str, token: str, link_list: list):
+    @staticmethod
+    @progress_bar
+    def upload(bar, file_path: str, token: str, data: list) -> list or int:
         files_list = []
-        print("Прогресс выгрузки в процессе... просим подождать!")
-        with alive_bar(len(link_list)) as bar:
-            for links in link_list:
-                bar()
-                time.sleep(1)
-                result = self.post(
-                    "https://cloud-api.yandex.net/v1/disk/resources/upload",
-                    headers={"Authorization": f"OAuth {token}"},
-                    params={
-                        "url": links["наибольший размер"]["url"],
-                        "disable_redirects": False,
-                        "path": f"/{file_path}/VK-{datetime.today()}{links['count_like']}.jpeg",
-                    },
-                )
-                if result.status_code != 202:
-                    print(f"ошибка! Код: {result.status_code}\nОписание: {result.json()['description']}")
-                    return result
-                return_dict = {
-                    "Имя файла": f"{links['count_like']}.jpeg",
-                    "Тип фото": links["Тип"],
-                }
-                files_list.append(return_dict)
-        print(f"Список фотографий загруженных на Диск: \n {files_list}")
+        for links in data:
+            bar()
+            time.sleep(1)
+            result = post(
+                "https://cloud-api.yandex.net/v1/disk/resources/upload",
+                headers={"Authorization": f"OAuth {token}"},
+                params={
+                    "url": links["biggest_size"]["url"],
+                    "disable_redirects": False,
+                    "path": f"/{file_path}/VK-{str(datetime.today()).split(' ')[0]}{links['count_like']}.jpeg",
+                },
+            )
+            if result.status_code != 202:
+                print(f"ERROR! Code: {result.status_code}\nTitle: {result.json()['description']}")
+                return result.status_code
+            return_dict = {
+                "File Name": f"{links['count_like']}.jpeg",
+                "Photo type": links["type"],
+            }
+            files_list.append(return_dict)
+        print(f"List of photos loaded on disk: \n {files_list}")
         return files_list
+
+
+if __name__ == "__main__":
+    data_list = []
+    YandexUpload.upload(file_path="photos", token=TOKEN_YANDEX, data=[
+        {
+            "biggest_size": {"url": "https://avatars.githubusercontent.com/u/86515876?v=4"},
+            "photo_id": 1,
+            "type": "x",
+            "count_like": 100
+        },
+        {
+            "biggest_size": {
+                "url": "https://github.githubassets.com/images/modules/profile/achievements/starstruck-default.png"
+            },
+            "photo_id": 2,
+            "type": "y",
+            "count_like": 1200
+        },
+    ])

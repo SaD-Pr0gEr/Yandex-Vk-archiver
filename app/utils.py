@@ -1,9 +1,18 @@
 import requests
+from alive_progress import alive_bar
 
 
 def choose_biggest_size(sizes):
     size = "smxopqryzw"
     return max(sizes, key=lambda s: size.index(s["type"]))
+
+
+def progress_bar(func):
+    def wrapper(**kwargs):
+        print("Uploading... Please wait!")
+        with alive_bar(len(kwargs["data"])) as bar:
+            func(bar=bar, **kwargs)
+    return wrapper
 
 
 class RequestManager:

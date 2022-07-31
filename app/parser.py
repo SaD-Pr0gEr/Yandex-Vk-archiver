@@ -5,7 +5,7 @@ from utils import RequestManager, choose_biggest_size
 
 
 class VkParser(RequestManager):
-    """Парсер ссылок на фото с ВКонтакте"""
+    """VK Photo links parser"""
 
     def __init__(self, token: str, version: int, user_id: int, count_max: int = 5):
         self.token = token
@@ -31,14 +31,14 @@ class VkParser(RequestManager):
         for photo in photo_links.json()["response"]["items"]:
             biggest_size = choose_biggest_size(photo["sizes"])
             link_list.append({
-                "ID Фото": photo["id"],
-                "наибольший размер": biggest_size,
-                "Тип": biggest_size["type"],
+                "photo_id": photo["id"],
+                "biggest_size": biggest_size,
+                "type": biggest_size["type"],
                 "count_like": photo["likes"]["count"]
             })
         print(
-            f"Спарсены Топ {self.count_max} фото с самым большим размером!\n"
-            f"ВНИМАНИЕ! Если ваши фотографии на профиле меньше чем вы указали в параметрах то "
-            f"програма выводит только те фотки которые у вас есть \n"
+            f"Parsed TOP {self.count_max} photos with biggest size!\n"
+            f"WARNING! If your photos less than you gave in the parameter "
+            f"program receives only those photos that  you have \n"
         )
         return link_list
