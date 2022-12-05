@@ -83,9 +83,9 @@ class YandexDiskResources(BaseUserDiskAPI):
         match response.status_code:
             case 204:
                 if safe_waste:
-                    print("Successfully deleted.")
-                else:
                     print("Successfully placed in the trash")
+                else:
+                    print("Successfully deleted.")
             case 404:
                 print("File(or folder) not found")
             case _:
