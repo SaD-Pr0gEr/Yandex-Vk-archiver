@@ -4,8 +4,11 @@ from typing import Union
 
 import requests
 
-from data_types import DIRECTORY, FILE
-from base import BaseUserDiskAPI
+from .data_types import DIRECTORY, FILE
+from .base import BaseUserDiskAPI
+
+
+__all__ = ("YandexDiskResources",)
 
 
 class YandexDiskResources(BaseUserDiskAPI):
@@ -18,16 +21,16 @@ class YandexDiskResources(BaseUserDiskAPI):
 
     def resource_meta_info(self, file_or_folder_path: str,
                            field_names: Union[list, tuple] = (),
-                           offset: int = 0) -> dict | None:
+                           offset: int = 0) -> Union[dict, int]:
         """File or folder meta info.
         file_or_folder_path: Path to file(or folder) on your Yandex Disk
         field_names: JSON data fieldnames(read API doc.)
         offset: number of elements to skip
 
-        Returns dict data with more info(Read API doc. about these fields)
+        Returns dict data with more info(Read API doc. about these fields) or status code
         """
         response = requests.get(
-            f"{self.RESOURCES_BASE_URL}",
+            self.RESOURCES_BASE_URL,
             headers=self.basic_header,
             params={
                 "path": file_or_folder_path,
@@ -42,10 +45,9 @@ class YandexDiskResources(BaseUserDiskAPI):
                 print("Resource not found!")
             case _:
                 print("Something went wrong... Please try again!")
-                return response.json()
-        return
+        return response.status_code
 
-    def create_folder(self, folder_name: str) -> dict | int:
+    def create_folder(self, folder_name: str) -> Union[dict, int]:
         """Create folder on Yandex Disk.
         folder_name: Folder name(path) that should create
 
@@ -123,7 +125,7 @@ class YandexDiskResources(BaseUserDiskAPI):
                 print("Something went wrong... Please try again")
         return response.status_code
 
-    def get_download_file_link(self, file_or_folder_path: str) -> str | int:
+    def get_download_file_link(self, file_or_folder_path: str) -> Union[str, int]:
         """Get file download link.
         file_path: absolute path to source file(or folder)
 
@@ -144,7 +146,7 @@ class YandexDiskResources(BaseUserDiskAPI):
                 print("Something went wrong... Please try again")
         return response.status_code
 
-    def move_resource(self, resource_path: str, copy_file_path: str, overwrite: bool = False):
+    def move_resource(self, resource_path: str, copy_file_path: str, overwrite: bool = False) -> int:
         """Move resource(file/folder) to other directory.
         resource_path: absolute path to source file(or folder)
 
@@ -173,7 +175,7 @@ class YandexDiskResources(BaseUserDiskAPI):
         return response.status_code
 
     def get_public_resources(self, limit: int, offset: int, resource_type: str,
-                             fields: Union[list, tuple] = ()) -> dict | int:
+                             fields: Union[list, tuple] = ()) -> Union[dict, int]:
         """Gets user public resources.
         fields: JSON data fieldnames(read API doc.)
         limit: Data limit
@@ -204,7 +206,7 @@ class YandexDiskResources(BaseUserDiskAPI):
                 print("Something went wrong... Please try again")
         return response.status_code
 
-    def publish_resource(self, file_path: str) -> str | int:
+    def publish_resource(self, file_path: str) -> Union[str, int]:
         """Publish resource on your Yandex Disk.
         file_path: Publish file path
 
@@ -246,7 +248,7 @@ class YandexDiskResources(BaseUserDiskAPI):
                 print("Something went wrong... Please try again")
         return response.status_code
 
-    def generate_file_upload_link(self, file_path: str, overwrite: bool = False):
+    def generate_file_upload_link(self, file_path: str, overwrite: bool = False) -> Union[str, int]:
         """Generate link for upload some file.
         file_path: File path
 
@@ -297,7 +299,7 @@ class YandexDiskResources(BaseUserDiskAPI):
                 print("Something went wrong... Please try again")
         return upload_response.status_code
 
-    def upload_file_from_url(self, upload_file_link: str, disk_file_path: str):
+    def upload_file_from_url(self, upload_file_link: str, disk_file_path: str) -> int:
         """Yandex disk uploads file by url.
         upload_file_link: File link to upload
 
@@ -309,7 +311,7 @@ class YandexDiskResources(BaseUserDiskAPI):
             params={"path": disk_file_path, "url": upload_file_link}
         )
         match response.status_code:
-            case 200 | 202:
+            case 200, 202:
                 print("Success uploaded")
             case 409:
                 print("File with similar name already exists!")

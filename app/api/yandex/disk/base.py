@@ -1,6 +1,9 @@
 """Basic classes for Yandex Disk API modules."""
 
 
+__all__ = ("BaseUserDiskAPI",)
+
+
 class BaseUserDiskAPI:
     """Base class for working with Yandex Disk API.
     access_token: OAuth token(Read more on documentation)

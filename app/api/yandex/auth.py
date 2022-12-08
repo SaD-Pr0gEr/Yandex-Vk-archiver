@@ -1,22 +1,26 @@
 """YandexDisk API authentication module."""
 
 import webbrowser
+from typing import Union
 
 import requests
 
-from base import YandexAPI
+from .base import YandexAPI
+
+
+__all__ = ("YandexAuthorize",)
 
 
 class YandexAuthorize(YandexAPI):
-    AUTH_URL = "https://oauth.yandex.ru/authorize/"
     OAUTH_BASE_URL = "https://oauth.yandex.ru/"
+    AUTHORIZE_URL = f"{OAUTH_BASE_URL}authorize/"
 
     def __init__(self, client_id: str, application_password: str) -> None:
         self.application_secret = application_password
         super().__init__(client_id)
 
-    def get_verify_code(self) -> int | None:
-        response = requests.get(self.AUTH_URL, params={
+    def get_verify_code_page(self) -> None:
+        response = requests.get(self.AUTHORIZE_URL, params={
             "client_id": self.client_id,
             "response_type": "code"
         })
@@ -24,13 +28,8 @@ class YandexAuthorize(YandexAPI):
             print("Something went wrong... Try again later!")
             return
         webbrowser.open(response.url)
-        verify_code = input("Input verify code from browser: ")
-        if not verify_code.isdecimal():
-            print("It's not number!")
-            return
-        return int(verify_code)
 
-    def get_access_token(self, verify_code: int) -> dict | None:
+    def get_access_token(self, verify_code: int) -> Union[dict, None]:
         response = requests.post(
             f"{self.OAUTH_BASE_URL}token",
             data={
@@ -49,11 +48,12 @@ class YandexAuthorize(YandexAPI):
         return response.json()
 
     def run_console_user_authenticate(self) -> None:
-        code = self.get_verify_code()
-        if not code:
-            print("Couldn't got verify code...")
+        self.get_verify_code_page()
+        verify_code = input("Input verify code from browser: ")
+        if not verify_code.isdecimal():
+            print("It's not number!")
             return
-        token = self.get_access_token(code)
+        token = self.get_access_token(int(verify_code))
         if not token:
             print("Couldn't got token...")
             return
